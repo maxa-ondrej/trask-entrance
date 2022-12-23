@@ -1,10 +1,13 @@
 package cz.majksa.trask.entrance
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import org.hibernate.annotations.Cascade
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -18,38 +21,35 @@ class Candidate(
     var birth: LocalDateTime,
     var city: String,
     var country: String,
+    var cv: String,
     var linkedin: String?,
     var github: String?,
-    var cv: String,
-    @OneToMany var technologyRelations: List<CandidateTechnology> = emptyList(),
+    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "candidate") var technologies: Set<CandidateTechnology> = emptySet(),
     @Id @GeneratedValue var id: Long? = null,
     @CreationTimestamp var createdAt: LocalDateTime? = null,
-    @UpdateTimestamp var updatedAt: LocalDateTime? = null) {
-    val technologies: List<Technology>
-        get() = technologyRelations.map { it.technology }
-}
+    @UpdateTimestamp var updatedAt: LocalDateTime? = null
+)
 
 @Entity
 class Technology(
+    
     var name: String,
-    var description: String?,
-    @OneToMany var candidateRelations: List<CandidateTechnology> = emptyList(),
+    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "technology") var candidates: Set<CandidateTechnology> = emptySet(),
     @Id @GeneratedValue var id: Long? = null,
     @CreationTimestamp var createdAt: LocalDateTime? = null,
-    @UpdateTimestamp var updatedAt: LocalDateTime? = null) {
-    val candidates: List<Candidate>
-        get() = candidateRelations.map { it.candidate }
-}
+    @UpdateTimestamp var updatedAt: LocalDateTime? = null
+)
 
 @Entity
 class CandidateTechnology(
-    @ManyToOne var candidate: Candidate,
-    @ManyToOne var technology: Technology,
+    @ManyToOne(cascade = [CascadeType.ALL], optional = false) @JoinColumn(name = "candidate_id") var candidate: Candidate,
+    @ManyToOne(cascade = [CascadeType.ALL], optional = false) @JoinColumn(name = "technology_id") var technology: Technology,
     level: Int,
-    var note: String,
+    var note: String?,
     @Id @GeneratedValue var id: Long? = null,
     @CreationTimestamp var createdAt: LocalDateTime? = null,
-    @UpdateTimestamp var updatedAt: LocalDateTime? = null) {
+    @UpdateTimestamp var updatedAt: LocalDateTime? = null
+) {
     var level: Int = level.requiredInRange(1, 10)
         set(value) {
             field = value.requiredInRange(1, 10)
