@@ -9,7 +9,7 @@ interface TechnologiesRepository : CrudRepository<Technology, Long>
 interface CandidatesTechnologiesRepository : CrudRepository<CandidateTechnology, Long> {
 
     @Query("SELECT ct FROM CandidateTechnology AS ct WHERE ct.candidate.id = :candidate AND ct.technology.id = :technology")
-    fun findByCandidateTechnologyByCandidateIdAndTechnologyId(
+    fun findByCandidateIdAndTechnologyId(
         @Param("candidate") candidate: Long,
         @Param("technology") technology: Long
     ): CandidateTechnology?

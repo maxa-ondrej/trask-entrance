@@ -15,12 +15,13 @@ class CandidatesController(private val repository: CandidatesRepository) {
     ).get().toDetailed()
 
     @PostMapping("/candidate")
-    fun createCandidate(@RequestBody candidate: Candidate): CandidateBasic = repository.save(candidate).toBasic()
+    fun createCandidate(@RequestBody candidate: CandidateInput): CandidateBasic = repository.save(candidate.toEntity()).toBasic()
 
     @PutMapping("/candidate/{id}")
-    fun updateCandidate(@PathVariable id: String, @RequestBody candidate: Candidate): CandidateBasic {
-        candidate.id = id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
-        return repository.save(candidate).toBasic()
+    fun updateCandidate(@PathVariable id: String, @RequestBody candidate: CandidateInput): CandidateBasic {
+        val entity = candidate.toEntity()
+        entity.id = id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
+        return repository.save(entity).toBasic()
     }
 
     @DeleteMapping("/candidate/{id}")
@@ -40,12 +41,13 @@ class TechnologiesController(private val repository: TechnologiesRepository) {
     ).get().toDetailed()
 
     @PostMapping("/technology")
-    fun createTechnology(@RequestBody technology: Technology): TechnologyBasic = repository.save(technology).toBasic()
+    fun createTechnology(@RequestBody technology: TechnologyInput): TechnologyBasic = repository.save(technology.toEntity()).toBasic()
 
     @PutMapping("/technology/{id}")
-    fun updateTechnology(@PathVariable id: String, @RequestBody technology: Technology): TechnologyBasic {
-        technology.id = id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
-        return repository.save(technology).toBasic()
+    fun updateTechnology(@PathVariable id: String, @RequestBody technology: TechnologyInput): TechnologyBasic {
+        val entity = technology.toEntity()
+        entity.id = id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
+        return repository.save(entity).toBasic()
     }
 
     @DeleteMapping("/technology/{id}")
@@ -66,7 +68,7 @@ class CandidatesTechnologiesController(
         @PathVariable technology: String,
         @RequestBody body: CandidateTechnologyInput
     ): CandidateDetailed {
-        var binding = candidatesTechnologies.findByCandidateTechnologyByCandidateIdAndTechnologyId(
+        var binding = candidatesTechnologies.findByCandidateIdAndTechnologyId(
             candidate.toLongOrNull() ?: throw IllegalArgumentException("Candidate id must be a number!"),
             technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!")
         )
@@ -77,12 +79,14 @@ class CandidatesTechnologiesController(
             technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!")
         ).get()
         if (binding == null) {
-            binding = candidatesTechnologies.save(CandidateTechnology(
-                candidate = candidateEntity,
-                technology = technologyEntity,
-                level = body.level,
-                note = body.note
-            ))
+            binding = candidatesTechnologies.save(
+                CandidateTechnology(
+                    candidate = candidateEntity,
+                    technology = technologyEntity,
+                    level = body.level,
+                    note = body.note
+                )
+            )
             binding.candidate.technologies += binding
             binding.technology.candidates += binding
         } else {
@@ -106,7 +110,7 @@ class CandidatesTechnologiesController(
         val technologyEntity = technologies.findById(
             technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!")
         ).get()
-        val binding = candidatesTechnologies.findByCandidateTechnologyByCandidateIdAndTechnologyId(
+        val binding = candidatesTechnologies.findByCandidateIdAndTechnologyId(
             candidateEntity.id ?: throw IllegalArgumentException("Candidate id must be a number!"),
             technologyEntity.id ?: throw IllegalArgumentException("Technology id must be a number!")
         )

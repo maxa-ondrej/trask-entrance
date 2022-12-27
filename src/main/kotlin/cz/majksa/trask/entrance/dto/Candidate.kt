@@ -1,7 +1,6 @@
 package cz.majksa.trask.entrance.dto
 
 import cz.majksa.trask.entrance.Candidate
-import java.time.LocalDateTime
 
 data class CandidateBasic(
     val id: Long,
@@ -9,10 +8,8 @@ data class CandidateBasic(
     val surname: String,
     val email: String,
     val phone: String,
-    val birth: LocalDateTime,
     val city: String,
     val country: String,
-    val cv: String,
     val linkedin: String?,
     val github: String?
 )
@@ -22,16 +19,36 @@ data class CandidateDetailed(
     val technologies: List<CandidateTechnologyBasic>
 )
 
+data class CandidateInput(
+    val name: String,
+    val surname: String,
+    val email: String,
+    val phone: String,
+    val city: String,
+    val country: String,
+    val linkedin: String?,
+    val github: String?
+) {
+    fun toEntity() = Candidate(
+        name = name,
+        surname = surname,
+        email = email,
+        phone = phone,
+        city = city,
+        country = country,
+        linkedin = linkedin,
+        github = github
+    )
+}
+
 fun Candidate.toBasic() = CandidateBasic(
     id = id ?: throw IllegalStateException("Candidate id is null"),
     name = name,
     surname = surname,
     email = email,
     phone = phone,
-    birth = birth,
     city = city,
     country = country,
-    cv = cv,
     linkedin = linkedin,
     github = github
 )

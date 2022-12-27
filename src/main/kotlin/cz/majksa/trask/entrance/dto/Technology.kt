@@ -12,6 +12,14 @@ data class TechnologyDetailed(
     val candidates: List<TechnologyCandidateBasic>
 )
 
+data class TechnologyInput(
+    val name: String
+) {
+    fun toEntity() = Technology(
+        name = name
+    )
+}
+
 fun Technology.toBasic() = TechnologyBasic(
     id = id ?: throw IllegalStateException("Technology id is null"),
     name = name
