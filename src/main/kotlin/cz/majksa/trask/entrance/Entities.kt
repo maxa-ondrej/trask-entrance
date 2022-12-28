@@ -5,6 +5,14 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
+/**
+ * Represents a single candidate with all the information about them.
+ * Can be bind to any technology using [technologies] field.
+ *
+ * @version 1.0.0
+ * @since 1.0.0
+ * @author Ondřej Maxa
+ */
 @Entity
 class Candidate(
     var name: String,
@@ -24,6 +32,13 @@ class Candidate(
     @UpdateTimestamp var updatedAt: LocalDateTime? = null
 )
 
+/**
+ * Represents a single technology that can be bind to a [Candidate].
+ *
+ * @version 1.0.0
+ * @since 1.0.0
+ * @author Ondřej Maxa
+ */
 @Entity
 class Technology(
     var name: String,
@@ -36,6 +51,13 @@ class Technology(
     @UpdateTimestamp var updatedAt: LocalDateTime? = null
 )
 
+/**
+ * Represents a binding between a [Candidate] and a [Technology].
+ *
+ * @version 1.0.0
+ * @since 1.0.0
+ * @author Ondřej Maxa
+ */
 @Entity
 class CandidateTechnology(
     @ManyToOne(
