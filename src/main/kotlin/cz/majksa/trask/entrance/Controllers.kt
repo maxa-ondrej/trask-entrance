@@ -1,7 +1,32 @@
 package cz.majksa.trask.entrance
 
 import cz.majksa.trask.entrance.dto.*
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.*
+import kotlin.NoSuchElementException
+
+@Order(Ordered.HIGHEST_PRECEDENCE)
+@ControllerAdvice
+class EntranceControllerAdvice {
+
+    @ExceptionHandler(NoSuchElementException::class)
+    @ResponseBody
+    @ResponseStatus
+    fun handleNoSuchElementException(exception: NoSuchElementException) = response(404, exception.message)
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    @ResponseBody
+    @ResponseStatus
+    fun handleIllegalArgumentException(exception: IllegalArgumentException) = response(403, exception.message)
+
+    fun response(code: Int, message: String?) = ResponseEntity(
+        mapOf("message" to Optional.ofNullable(message).orElse("No message provided")), HttpStatusCode.valueOf(code)
+    )
+}
 
 @RestController
 @RequestMapping("/api/candidate")
