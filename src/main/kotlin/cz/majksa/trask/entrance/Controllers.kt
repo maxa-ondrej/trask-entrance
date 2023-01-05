@@ -4,7 +4,8 @@ import cz.majksa.trask.entrance.dto.*
 import org.springframework.web.bind.annotation.*
 
 @RestController
-class CandidatesController(private val repository: CandidatesRepository) {
+@RequestMapping("/api/candidate")
+class CandidatesController(private val service: CandidateService) {
 
     /**
      * Returns a list of all candidates.
@@ -13,8 +14,8 @@ class CandidatesController(private val repository: CandidatesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @GetMapping("/candidate")
-    fun getCandidates(): Iterable<CandidateBasic> = repository.findAll().map { it.toBasic() }
+    @GetMapping
+    fun getCandidates() = service.findAll().map { it.toBasic() }
 
     /**
      * Returns a single candidate by id.
@@ -24,8 +25,8 @@ class CandidatesController(private val repository: CandidatesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @GetMapping("/candidate/{id}")
-    fun getCandidate(@PathVariable id: String): CandidateDetailed = repository.findById(
+    @GetMapping("{id}")
+    fun getCandidate(@PathVariable id: String) = service.find(
         id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
     ).get().toDetailed()
 
@@ -37,9 +38,9 @@ class CandidatesController(private val repository: CandidatesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @PostMapping("/candidate")
-    fun createCandidate(@RequestBody candidate: CandidateInput): CandidateBasic =
-        repository.save(candidate.toEntity()).toBasic()
+    @PostMapping
+    fun createCandidate(@RequestBody candidate: CandidateInput) =
+        service.create(candidate).toBasic()
 
     /**
      * Updates a candidate to the new representation received.
@@ -50,12 +51,11 @@ class CandidatesController(private val repository: CandidatesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @PutMapping("/candidate/{id}")
-    fun updateCandidate(@PathVariable id: String, @RequestBody candidate: CandidateInput): CandidateBasic {
-        val entity = candidate.toEntity()
-        entity.id = id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
-        return repository.save(entity).toBasic()
-    }
+    @PutMapping("{id}")
+    fun updateCandidate(@PathVariable id: String, @RequestBody candidate: CandidateInput) = service.update(
+        id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"),
+        candidate
+    )
 
     /**
      * Deletes a candidate.
@@ -65,13 +65,15 @@ class CandidatesController(private val repository: CandidatesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @DeleteMapping("/candidate/{id}")
-    fun deleteCandidate(@PathVariable id: String) =
-        repository.deleteById(id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"))
+    @DeleteMapping("{id}")
+    fun deleteCandidate(@PathVariable id: String) = mapOf(
+        "success" to service.delete(id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"))
+    )
 }
 
 @RestController
-class TechnologiesController(private val repository: TechnologiesRepository) {
+@RequestMapping("/api/technology")
+class TechnologiesController(private val service: TechnologyService) {
 
     /**
      * Returns all technologies.
@@ -80,8 +82,8 @@ class TechnologiesController(private val repository: TechnologiesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @GetMapping("/technology")
-    fun getTechnologies(): Iterable<TechnologyBasic> = repository.findAll().map { it.toBasic() }
+    @GetMapping
+    fun getTechnologies() = service.findAll().map { it.toBasic() }
 
     /**
      * Returns a single technology by id.
@@ -91,8 +93,8 @@ class TechnologiesController(private val repository: TechnologiesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @GetMapping("/technology/{id}")
-    fun getTechnology(@PathVariable id: String): TechnologyDetailed = repository.findById(
+    @GetMapping("{id}")
+    fun getTechnology(@PathVariable id: String) = service.find(
         id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
     ).get().toDetailed()
 
@@ -104,9 +106,8 @@ class TechnologiesController(private val repository: TechnologiesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @PostMapping("/technology")
-    fun createTechnology(@RequestBody technology: TechnologyInput): TechnologyBasic =
-        repository.save(technology.toEntity()).toBasic()
+    @PostMapping
+    fun createTechnology(@RequestBody technology: TechnologyInput) = service.create(technology).toBasic()
 
     /**
      * Updates a technology to the new representation received.
@@ -117,12 +118,11 @@ class TechnologiesController(private val repository: TechnologiesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @PutMapping("/technology/{id}")
-    fun updateTechnology(@PathVariable id: String, @RequestBody technology: TechnologyInput): TechnologyBasic {
-        val entity = technology.toEntity()
-        entity.id = id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
-        return repository.save(entity).toBasic()
-    }
+    @PutMapping("{id}")
+    fun updateTechnology(@PathVariable id: String, @RequestBody technology: TechnologyInput) = service.update(
+        id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"),
+        technology
+    ).toBasic()
 
     /**
      * Deletes a technology.
@@ -132,17 +132,15 @@ class TechnologiesController(private val repository: TechnologiesRepository) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @DeleteMapping("/technology/{id}")
-    fun deleteTechnology(@PathVariable id: String) =
-        repository.deleteById(id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"))
+    @DeleteMapping("{id}")
+    fun deleteTechnology(@PathVariable id: String) = mapOf(
+        "success" to service.delete(id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"))
+    )
 }
 
 @RestController
-class CandidatesTechnologiesController(
-    private val candidates: CandidatesRepository,
-    private val technologies: TechnologiesRepository,
-    private val candidatesTechnologies: CandidatesTechnologiesRepository
-) {
+@RequestMapping("/candidate/{candidate}/technology/{technology}")
+class CandidatesTechnologiesController(private val service: CandidatesTechnologiesService) {
 
     /**
      * Adds a technology to a candidate. (Creates a new relationship) If the relationship already exists, it is updated.
@@ -154,45 +152,16 @@ class CandidatesTechnologiesController(
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @PostMapping("/candidate/{candidate}/technology/{technology}")
+    @PostMapping
     fun addTechnology(
         @PathVariable candidate: String,
         @PathVariable technology: String,
         @RequestBody body: CandidateTechnologyInput
-    ): CandidateDetailed {
-        var binding = candidatesTechnologies.findByCandidateIdAndTechnologyId(
-            candidate.toLongOrNull() ?: throw IllegalArgumentException("Candidate id must be a number!"),
-            technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!")
-        )
-        val candidateEntity = candidates.findById(
-            candidate.toLongOrNull() ?: throw IllegalArgumentException("Candidate id must be a number!")
-        ).get()
-        val technologyEntity = technologies.findById(
-            technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!")
-        ).get()
-
-        if (binding == null) {
-            // If the relationship does not exist, create it
-            binding = candidatesTechnologies.save(
-                CandidateTechnology(
-                    candidate = candidateEntity,
-                    technology = technologyEntity,
-                    level = body.level,
-                    note = body.note
-                )
-            )
-            binding.candidate.technologies += binding
-            binding.technology.candidates += binding
-        } else {
-            // If the relationship exists, update it
-            binding.level = body.level
-            binding.note = body.note
-            binding.candidate = candidateEntity
-            binding.technology = technologyEntity
-            candidatesTechnologies.save(binding)
-        }
-        return binding.candidate.toDetailed()
-    }
+    ) = service.create(
+        candidate.toLongOrNull() ?: throw IllegalArgumentException("Candidate id must be a number!"),
+        technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!"),
+        body
+    ).candidate.toDetailed()
 
     /**
      * Removes a technology from a candidate. (Deletes the relationship)
@@ -203,29 +172,15 @@ class CandidatesTechnologiesController(
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @DeleteMapping("/candidate/{candidate}/technology/{technology}")
+    @DeleteMapping
     fun removeTechnology(
         @PathVariable candidate: String,
         @PathVariable technology: String
-    ): CandidateDetailed {
-        val candidateEntity = candidates.findById(
-            candidate.toLongOrNull() ?: throw IllegalArgumentException("Candidate id must be a number!")
-        ).get()
-        val technologyEntity = technologies.findById(
+    ) = mapOf(
+        "success" to service.delete(
+            candidate.toLongOrNull() ?: throw IllegalArgumentException("Candidate id must be a number!"),
             technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!")
-        ).get()
-
-        val binding = candidatesTechnologies.findByCandidateIdAndTechnologyId(
-            candidateEntity.id ?: throw IllegalArgumentException("Candidate id must be a number!"),
-            technologyEntity.id ?: throw IllegalArgumentException("Technology id must be a number!")
         )
-        binding?.let {
-            candidateEntity.technologies -= it
-            technologyEntity.candidates -= it
-            candidatesTechnologies.delete(it)
-        }
-
-        return candidateEntity.toDetailed()
-    }
+    )
 
 }

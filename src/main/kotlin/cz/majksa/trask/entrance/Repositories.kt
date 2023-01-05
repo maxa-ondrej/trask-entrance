@@ -4,7 +4,8 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 
-interface CandidatesRepository : CrudRepository<Candidate, Long>
+interface
+CandidatesRepository : CrudRepository<Candidate, Long>
 interface TechnologiesRepository : CrudRepository<Technology, Long>
 interface CandidatesTechnologiesRepository : CrudRepository<CandidateTechnology, Long> {
     /**
