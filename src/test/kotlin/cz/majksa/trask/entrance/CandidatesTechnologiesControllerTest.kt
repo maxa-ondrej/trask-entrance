@@ -35,6 +35,8 @@ class CandidatesTechnologiesControllerTest(@Autowired val mockMvc: MockMvc) {
         // given
         val input = CandidateTechnologyInput(3, null)
         val binding = CandidateTechnology(candidates[0], technologies[1], input.level, input.note, id = 1)
+        candidates[0].technologies += binding
+        technologies[1].candidates += binding
         every { service.create(1, 2, input) } returns binding
 
         // when
