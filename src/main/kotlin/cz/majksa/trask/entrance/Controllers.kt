@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
 import kotlin.NoSuchElementException
+import kotlin.IllegalArgumentException
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -21,7 +22,7 @@ class EntranceControllerAdvice {
     @ExceptionHandler(IllegalArgumentException::class)
     @ResponseBody
     @ResponseStatus
-    fun handleIllegalArgumentException(exception: IllegalArgumentException) = response(403, exception.message)
+    fun handleIllegalArgumentException(exception: IllegalArgumentException) = response(400, exception.message)
 
     fun response(code: Int, message: String?) = ResponseEntity(
         mapOf("message" to Optional.ofNullable(message).orElse("No message provided")), HttpStatusCode.valueOf(code)
@@ -51,9 +52,7 @@ class CandidatesController(private val service: CandidateService) {
      * @author Ondřej Maxa
      */
     @GetMapping("{id}")
-    fun getCandidate(@PathVariable id: String) = service.find(
-        id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
-    ).get().toDetailed()
+    fun getCandidate(@PathVariable id: Long) = service.find(id).get().toDetailed()
 
     /**
      * Creates a new candidate.
@@ -77,10 +76,7 @@ class CandidatesController(private val service: CandidateService) {
      * @author Ondřej Maxa
      */
     @PutMapping("{id}")
-    fun updateCandidate(@PathVariable id: String, @RequestBody candidate: CandidateInput) = service.update(
-        id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"),
-        candidate
-    )
+    fun updateCandidate(@PathVariable id: Long, @RequestBody candidate: CandidateInput) = service.update(id, candidate)
 
     /**
      * Deletes a candidate.
@@ -91,9 +87,7 @@ class CandidatesController(private val service: CandidateService) {
      * @author Ondřej Maxa
      */
     @DeleteMapping("{id}")
-    fun deleteCandidate(@PathVariable id: String) = mapOf(
-        "success" to service.delete(id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"))
-    )
+    fun deleteCandidate(@PathVariable id: Long) = mapOf("success" to service.delete(id))
 }
 
 @RestController
@@ -119,9 +113,7 @@ class TechnologiesController(private val service: TechnologyService) {
      * @author Ondřej Maxa
      */
     @GetMapping("{id}")
-    fun getTechnology(@PathVariable id: String) = service.find(
-        id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!")
-    ).get().toDetailed()
+    fun getTechnology(@PathVariable id: Long) = service.find(id).get().toDetailed()
 
     /**
      * Creates a new technology.
@@ -144,10 +136,8 @@ class TechnologiesController(private val service: TechnologyService) {
      * @author Ondřej Maxa
      */
     @PutMapping("{id}")
-    fun updateTechnology(@PathVariable id: String, @RequestBody technology: TechnologyInput) = service.update(
-        id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"),
-        technology
-    ).toBasic()
+    fun updateTechnology(@PathVariable id: Long, @RequestBody technology: TechnologyInput) =
+        service.update(id, technology).toBasic()
 
     /**
      * Deletes a technology.
@@ -158,13 +148,11 @@ class TechnologiesController(private val service: TechnologyService) {
      * @author Ondřej Maxa
      */
     @DeleteMapping("{id}")
-    fun deleteTechnology(@PathVariable id: String) = mapOf(
-        "success" to service.delete(id.toLongOrNull() ?: throw IllegalArgumentException("Id must be a number!"))
-    )
+    fun deleteTechnology(@PathVariable id: Long) = mapOf("success" to service.delete(id))
 }
 
 @RestController
-@RequestMapping("/candidate/{candidate}/technology/{technology}")
+@RequestMapping("/api/candidate/{candidate}/technology/{technology}")
 class CandidatesTechnologiesController(private val service: CandidatesTechnologiesService) {
 
     /**
@@ -179,14 +167,10 @@ class CandidatesTechnologiesController(private val service: CandidatesTechnologi
      */
     @PostMapping
     fun addTechnology(
-        @PathVariable candidate: String,
-        @PathVariable technology: String,
+        @PathVariable candidate: Long,
+        @PathVariable technology: Long,
         @RequestBody body: CandidateTechnologyInput
-    ) = service.create(
-        candidate.toLongOrNull() ?: throw IllegalArgumentException("Candidate id must be a number!"),
-        technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!"),
-        body
-    ).candidate.toDetailed()
+    ) = service.create(candidate, technology, body).candidate.toDetailed()
 
     /**
      * Removes a technology from a candidate. (Deletes the relationship)
@@ -198,14 +182,8 @@ class CandidatesTechnologiesController(private val service: CandidatesTechnologi
      * @author Ondřej Maxa
      */
     @DeleteMapping
-    fun removeTechnology(
-        @PathVariable candidate: String,
-        @PathVariable technology: String
-    ) = mapOf(
-        "success" to service.delete(
-            candidate.toLongOrNull() ?: throw IllegalArgumentException("Candidate id must be a number!"),
-            technology.toLongOrNull() ?: throw IllegalArgumentException("Technology id must be a number!")
-        )
+    fun removeTechnology(@PathVariable candidate: Long, @PathVariable technology: Long) = mapOf(
+        "success" to service.delete(candidate, technology)
     )
 
 }
