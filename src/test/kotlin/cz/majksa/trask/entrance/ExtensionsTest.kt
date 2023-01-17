@@ -24,4 +24,19 @@ class ExtensionsTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["John", "Joe", "Jane", "Josh"])
+    fun `givenValidStrings whenStringRequiredNotBlank returnInt`(text: String) {
+        val result = text.requiredNotBlank()
+        assertThat(result).isEqualTo(text)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["", " ", "  ", "   "])
+    fun `givenEmptyStrings whenStringRequiredNotBlank throwException`(text: String) {
+        assertThrows<IllegalArgumentException> {
+            text.requiredNotBlank()
+        }
+    }
+
 }

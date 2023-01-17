@@ -53,7 +53,10 @@ class CandidatesControllerTest(@Autowired val mockMvc: MockMvc) {
         mockMvc.get("/api/candidate/${id}").andExpect {
             // then
             status { isOk() }
-            content { contentType("application/json") }
+            content {
+                contentType("application/json")
+                jsonPath("$.candidate.name") { value(candidates[id.toInt() - 1].name) }
+            }
         }
     }
 
@@ -73,7 +76,7 @@ class CandidatesControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `whenPost thenReturnCandidate`() {
         // given
-        val candidateInput = CandidateInput("John", "Doe", "", "", "", "", null, null)
+        val candidateInput = CandidateInput("Josh", "Doe", "", "", "", "", null, null)
         every { service.create(candidateInput) } returns candidateInput.toEntity().also { it.id = 1 }
 
         // when
@@ -85,7 +88,7 @@ class CandidatesControllerTest(@Autowired val mockMvc: MockMvc) {
             status { isOk() }
             content {
                 contentType("application/json")
-                jsonPath("$.name") { value("John") }
+                jsonPath("$.name") { value("Josh") }
                 jsonPath("$.surname") { value("Doe") }
             }
         }
@@ -94,7 +97,7 @@ class CandidatesControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `whenPut thenReturnCandidate`() {
         // given
-        val candidateInput = CandidateInput("John", "Doe", "", "", "", "", null, null)
+        val candidateInput = CandidateInput("Josh", "Doe", "", "", "", "", null, null)
         every { service.update(1, candidateInput) } returns candidateInput.toEntity().also { it.id = 1 }
 
         // when
@@ -106,7 +109,7 @@ class CandidatesControllerTest(@Autowired val mockMvc: MockMvc) {
             status { isOk() }
             content {
                 contentType("application/json")
-                jsonPath("$.name") { value("John") }
+                jsonPath("$.name") { value("Josh") }
                 jsonPath("$.surname") { value("Doe") }
             }
         }

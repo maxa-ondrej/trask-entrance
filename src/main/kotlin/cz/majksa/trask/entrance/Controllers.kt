@@ -51,7 +51,7 @@ class CandidatesController(private val service: CandidateService) {
      * @since 1.0.0
      * @author Ondřej Maxa
      */
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     fun getCandidate(@PathVariable id: Long) = service.find(id).get().toDetailed()
 
     /**

@@ -34,7 +34,7 @@ data class CandidateDetailed(
 )
 
 /**
- * DTO request class for creating a new candidate.
+ * DTO request class for creating a new candidate or updating an existing one.
  *
  * @version 1.0.0
  * @since 1.0.0

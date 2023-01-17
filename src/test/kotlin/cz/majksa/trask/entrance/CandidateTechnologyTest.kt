@@ -19,7 +19,7 @@ class CandidateTechnologyTest {
     }
 
     @Test
-    fun `givenOutOfRange whenSetLevel thenApplyChange`() {
+    fun `givenOutOfRange whenSetLevel thenThrowException`() {
         val candidateTechnology = CandidateTechnology(mockk(), mockk(), 1, null)
         assertThrows<IllegalArgumentException> {
             candidateTechnology.level = 11

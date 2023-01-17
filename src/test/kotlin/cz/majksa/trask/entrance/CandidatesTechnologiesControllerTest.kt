@@ -49,6 +49,7 @@ class CandidatesTechnologiesControllerTest(@Autowired val mockMvc: MockMvc) {
             content {
                 contentType("application/json")
                 jsonPath("$.candidate.name") { value("John") }
+                jsonPath("$.technologies[0].technology.name") { value("Kotlin") }
             }
         }
     }

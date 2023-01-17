@@ -30,7 +30,7 @@ class DTOMethodsTest {
 
         // then
         assertThat(detailedCandidate.candidate.name).isEqualTo(candidates[0].name)
-        assertThat(detailedCandidate.technologies[0].name).isEqualTo(candidates[0].technologies.first().technology.name)
+        assertThat(detailedCandidate.technologies[0].technology.name).isEqualTo(candidates[0].technologies.first().technology.name)
         assertThat(detailedTechnology.technology.name).isEqualTo(technologies[0].name)
         assertThat(detailedTechnology.candidates[0].candidate.name).isEqualTo(technologies[0].candidates.first().candidate.name)
     }

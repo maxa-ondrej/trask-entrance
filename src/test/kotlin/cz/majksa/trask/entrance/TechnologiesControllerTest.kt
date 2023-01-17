@@ -53,7 +53,10 @@ class TechnologiesControllerTest(@Autowired val mockMvc: MockMvc) {
         mockMvc.get("/api/technology/${id}").andExpect {
             // then
             status { isOk() }
-            content { contentType("application/json") }
+            content {
+                contentType("application/json")
+                jsonPath("$.technology.name") { value(technologies[id.toInt() - 1].name) }
+            }
         }
     }
 

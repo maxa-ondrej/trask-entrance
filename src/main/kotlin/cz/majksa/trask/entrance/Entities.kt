@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 /**
  * Represents a single candidate with all the information about them.
- * Can be bind to any technology using [technologies] field.
+ * Can be bound to any technology using [technologies] field.
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -15,7 +15,7 @@ import java.time.LocalDateTime
  */
 @Entity
 class Candidate(
-    var name: String,
+    name: String,
     var surname: String,
     var email: String,
     var phone: String,
@@ -30,10 +30,15 @@ class Candidate(
     @Id @GeneratedValue var id: Long? = null,
     @CreationTimestamp var createdAt: LocalDateTime? = null,
     @UpdateTimestamp var updatedAt: LocalDateTime? = null
-)
+) {
+    var name: String = name.requiredNotBlank()
+        set(value) {
+            field = value.requiredNotBlank()
+        }
+}
 
 /**
- * Represents a single technology that can be bind to a [Candidate].
+ * Represents a single technology that can be bound to a [Candidate].
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -41,7 +46,7 @@ class Candidate(
  */
 @Entity
 class Technology(
-    var name: String,
+    name: String,
     @OneToMany(
         cascade = [CascadeType.ALL],
         mappedBy = "technology"
@@ -49,7 +54,12 @@ class Technology(
     @Id @GeneratedValue var id: Long? = null,
     @CreationTimestamp var createdAt: LocalDateTime? = null,
     @UpdateTimestamp var updatedAt: LocalDateTime? = null
-)
+) {
+    var name: String = name.requiredNotBlank()
+        set(value) {
+            field = value.requiredNotBlank()
+        }
+}
 
 /**
  * Represents a binding between a [Candidate] and a [Technology].

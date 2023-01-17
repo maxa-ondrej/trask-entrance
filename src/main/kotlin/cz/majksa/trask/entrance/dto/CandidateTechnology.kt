@@ -10,7 +10,7 @@ import cz.majksa.trask.entrance.CandidateTechnology
  * @author Ondřej Maxa
  */
 data class CandidateTechnologyBasic(
-    val name: String,
+    val technology: TechnologyBasic,
     val level: Int,
     val note: String?,
 )
@@ -29,7 +29,7 @@ data class TechnologyCandidateBasic(
 )
 
 /**
- * DTO request class for creating a new candidate-technology binding.
+ * DTO request class for creating a new candidate-technology binding or updating an existing one.
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -48,7 +48,7 @@ data class CandidateTechnologyInput(
  * @author Ondřej Maxa
  */
 fun CandidateTechnology.withTechnology() = CandidateTechnologyBasic(
-    name = technology.name,
+    technology = technology.toBasic(),
     level = level,
     note = note
 )
